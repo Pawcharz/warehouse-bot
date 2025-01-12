@@ -47,6 +47,10 @@ ExportedObj/
 *.opendb
 *.VC.db
 
+# ML agents results
+results
+Assets/ML-Agents
+
 # Unity3D generated meta files
 *.pidb.meta
 *.pdb.meta

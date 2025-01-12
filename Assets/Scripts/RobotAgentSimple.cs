@@ -3,6 +3,7 @@ using Unity.MLAgents;
 using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Sensors;
 using UnityEngine.AI;
+using System.Collections.Generic;
 
 public class RobotAgentSimple : Agent
 {
@@ -14,9 +15,9 @@ public class RobotAgentSimple : Agent
 
     [SerializeField] private Transform warehouseTransform;
 
-    [SerializeField] private Transform resourceBlueTransform;
+    [SerializeField] private Transform colorIndicator;
 
-    [SerializeField] private Transform resourceYellowTransform;
+
 
     [SerializeField] private float maxSpawnOffset = 2f;
 
@@ -27,78 +28,146 @@ public class RobotAgentSimple : Agent
     [SerializeField] private Rigidbody rigidbody;
 
     // Rewards
-    [SerializeField] private float hitWallPenalty = -1;
+    [SerializeField] private float hitWallPenalty = -50;
 
     [SerializeField] private float PickupCorrectReward = 100;
     [SerializeField] private float PickupIncorrectPenalty = -100;
 
     [SerializeField] private float DropCorrectReward = 100;
-    [SerializeField] private float DropIncorrectReward = -100;
 
-    [SerializeField] private float StepReward = -0.2f;
+    [SerializeField] private float StepTimeReward = -0.4f;
 
     [SerializeField] private Material neutralMaterial;
+    [SerializeField] private List<GameObject> items;
+
+
+    private Resource TagToResource(string tag)
+    {
+        if (tag == "Resource_Blue") return Resource.Blue;
+        if (tag == "Resource_Yellow") return Resource.Yellow;
+
+        return Resource.None;
+    }
+
+    private void EnterTrigger(Collider other)
+    {
+        if (other.tag == "Warehouse")
+        {
+            if (heldResource == demandedResource)
+            {
+                Debug.Log("Dropped Correctly");
+                heldResource = Resource.None;
+                AddReward(DropCorrectReward);
+
+                EndEpisode();
+            }
+        }
+        else
+        {
+            foreach (GameObject item in items)
+            {
+                if (other.tag == item.tag)
+                {
+                    // Found entered item
+
+                    if (TagToResource(item.tag) == demandedResource && demandedResource != heldResource)
+                    {
+                        // pick up
+                        Debug.Log("Picked up correctly");
+                        heldResource = demandedResource;
+                        AddReward(PickupCorrectReward);
+
+                        SetBodyColor();
+                        item.SetActive(false);
+                    }
+                    else
+                    {
+                        Debug.Log("Picked up incorrectly");
+                        AddReward(PickupIncorrectPenalty);
+                    }
+                }
+            }
+        }
+    }
 
     private Resource heldResource = Resource.None;
     private Resource demandedResource;
 
+    private Material GetProperColor()
+    {
+        foreach (GameObject item in items)
+        {
+            if (TagToResource(item.tag) == heldResource)
+            {
+                Material material = item.gameObject.GetComponent<Renderer>().material;
+                return material;
+            }
+        }
+
+        return neutralMaterial;
+    }
     private void SetBodyColor()
     {
-        if (heldResource == Resource.Yellow)
-        {
-            Material material = resourceYellowTransform.GetComponent<Renderer>().material;
-            body.material = material;
-        }
-        else if (heldResource == Resource.Blue)
-        {
-            Material material = resourceBlueTransform.GetComponent<Renderer>().material;
-            body.material = material;
-        }
-        else
-        {
-            body.material = neutralMaterial;
-        }
+        body.material = GetProperColor();
     }
 
     private void ChooseDemandedResource()
     {
-        int drawn = Random.Range(0, 2);
-
-        if (drawn == 0)
-        {
-            demandedResource = Resource.Blue;
-        }
-        else
-        {
-            demandedResource = Resource.Yellow;
-        }
+        int id = Random.Range(0, items.Count);
+        demandedResource = TagToResource(items[id].tag);
     }
 
     private void SetupSimulation()
     {
+        // Activate resources again
+
+        foreach (GameObject item in items)
+        {
+            item.SetActive(true);
+        }
+
         transform.localPosition = Vector3.zero;
         transform.localRotation = Quaternion.AngleAxis(Random.Range(0, 360), transform.up);
 
         // Randomize strategic points locations
         warehouseTransform.localPosition = new Vector3(Random.Range(-maxSpawnOffset, maxSpawnOffset), 0, Random.Range(-maxSpawnOffset, maxSpawnOffset));
-        resourceYellowTransform.localPosition = new Vector3(Random.Range(-maxSpawnOffset, maxSpawnOffset), 0, Random.Range(-maxSpawnOffset, maxSpawnOffset));
-        resourceBlueTransform.localPosition = new Vector3(Random.Range(-maxSpawnOffset, maxSpawnOffset), 0, Random.Range(-maxSpawnOffset, maxSpawnOffset));
+
+        foreach (GameObject item in items)
+        {
+            item.transform.localPosition = new Vector3(Random.Range(-maxSpawnOffset, maxSpawnOffset), 0, Random.Range(-maxSpawnOffset, maxSpawnOffset));
+        }
 
         // Randomize Initial state
         float random = Random.Range(0f, 1f);
-        if (random < 0.3)
+        ChooseDemandedResource();
+
+        // Set indicator to demanded resource
+        foreach (GameObject item in items)
         {
-            demandedResource = Resource.Yellow;
-            heldResource = Resource.Yellow;
+            if (TagToResource(item.tag) == demandedResource)
+            {
+                Material material = item.gameObject.GetComponent<Renderer>().material;
+
+                colorIndicator.GetComponent<Renderer>().material = material;
+            }
         }
-        else if (random < 0.6)
+
+       
+        if (random < 0.5)
         {
-            demandedResource = Resource.Blue;
-            heldResource = Resource.Blue;
+            heldResource = demandedResource;
+
+            // Deactivate already picked up resource
+            foreach (GameObject item in items)
+            {
+                if (TagToResource(item.tag) == heldResource)
+                {
+                    item.SetActive(false);
+                }
+            }
         }
         else
         {
-            ChooseDemandedResource();
             heldResource = Resource.None;
         }
 
@@ -170,11 +239,6 @@ public class RobotAgentSimple : Agent
 
     public override void CollectObservations(VectorSensor sensor)
     {
-        /*Vector3 robotPosition = transform.localPosition;
-        Vector3 robotOrientation = transform.forward;
-
-        sensor.AddObservation(new Vector2(robotPosition.x, robotPosition.z));
-        sensor.AddObservation(new Vector2(robotOrientation.x, robotOrientation.z));*/
 
         // Demanded Resource
         bool isBlueDemanded = demandedResource == Resource.Blue;
@@ -209,9 +273,7 @@ public class RobotAgentSimple : Agent
         int action = actions.DiscreteActions[0];
 
         float rotation = 0;
-        float movement = 1;
-
-        /*float movement = 0;
+        float movement = 0;
 
         if (action == 0)
         {
@@ -222,15 +284,6 @@ public class RobotAgentSimple : Agent
             rotation = -1;
         }
         else if (action == 2)
-        {
-            rotation = 1;
-        }*/
-
-        if (action == 0)
-        {
-            rotation = -1;
-        }
-        else if (action == 1)
         {
             rotation = 1;
         }
@@ -246,7 +299,16 @@ public class RobotAgentSimple : Agent
             Debug.Log("Timeout - reward - " + GetCumulativeReward());
         }
 
-        AddReward(StepReward);
+        AddReward(StepTimeReward);
+
+        /*if (action == 0)
+        {
+            AddReward(StepMovementReward);
+        }
+        else
+        {
+            AddReward(StepTimeReward);
+        }*/
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -262,59 +324,7 @@ public class RobotAgentSimple : Agent
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.tag == "Resource_Blue")
-        {
-            if (heldResource == Resource.None && demandedResource == Resource.Blue)
-            {
-                Debug.Log("PickedUp Correctly blue");
-                heldResource = demandedResource;
-                AddReward(PickupCorrectReward);
-
-                SetBodyColor();
-            }
-            else
-            {
-                Debug.Log("PickedUp Incorrectly blue");
-                AddReward(PickupIncorrectPenalty);
-            }
-            
-        }
-        else if (other.tag == "Resource_Yellow")
-        {
-            if (heldResource == Resource.None && demandedResource == Resource.Yellow)
-            {
-                Debug.Log("PickedUp Correctly yellow");
-                heldResource = demandedResource;
-                AddReward(PickupCorrectReward);
-
-                SetBodyColor();
-            }
-            else
-            {
-                Debug.Log("PickedUp Incorrectly yellow");
-                AddReward(PickupIncorrectPenalty);
-            }
-        }
-        else if (other.tag == "Warehouse")
-        {
-            if (heldResource == demandedResource)
-            {
-                Debug.Log("Dropped Correctly");
-                heldResource = Resource.None;
-                AddReward(DropCorrectReward);
-
-                EndEpisode();
-                //ChooseDemandedResource();
-
-                // body.material = neutralMaterial;
-            }
-            else
-            {
-                Debug.Log("Dropped Inorrectly");
-                AddReward(DropIncorrectReward);
-            }
-        }
-        
+        EnterTrigger(other);
     }
 
     private void FixedUpdate()

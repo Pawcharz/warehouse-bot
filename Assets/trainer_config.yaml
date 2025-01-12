@@ -1,5 +1,5 @@
 behaviors:
-  Dlivery_Bot:
+  Dlivery_Bot_2:
     trainer_type: ppo
     hyperparameters:
       batch_size: 1024
@@ -23,7 +23,7 @@ behaviors:
     checkpoint_interval: 100000
     max_steps: 4000000
     time_horizon: 1024
-    summary_freq: 20000
+    summary_freq: 40000
     # threaded: False
 
     
