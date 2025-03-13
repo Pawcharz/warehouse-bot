@@ -11,8 +11,8 @@ GameObject:
   - component: {fileID: 479029623770934511}
   - component: {fileID: 7857986801689507661}
   - component: {fileID: 477313860672277574}
-  - component: {fileID: 7937368639637061206}
-  - component: {fileID: 1422287545361408604}
+  - component: {fileID: 4433824349836300401}
+  - component: {fileID: 2358845908333356136}
   m_Layer: 0
   m_Name: agent
   m_TagString: Player
@@ -95,7 +95,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &7937368639637061206
+--- !u!114 &4433824349836300401
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -104,7 +104,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 155330914743943698}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c0483ee4440e16c4498c3583fc878d6b, type: 3}
+  m_Script: {fileID: 11500000, guid: a3d351247d673574d9b29e417d5b701e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   agentParameters:
@@ -116,18 +116,19 @@ MonoBehaviour:
   numberOfRays: 24
   rayDistance: 100
   warehouseTransform: {fileID: 0}
-  resourceBlueTransform: {fileID: 0}
-  resourceYellowTransform: {fileID: 0}
+  colorIndicator: {fileID: 0}
   maxSpawnOffset: 2
   body: {fileID: 2669153520018726259}
   rigidbody: {fileID: 477313860672277574}
-  hitWallPenalty: -50
+  hitWallPenalty: -100
   PickupCorrectReward: 100
   PickupIncorrectPenalty: -100
   DropCorrectReward: 100
-  StepTimeReward: -0.4
+  DropIncorrectReward: -100
+  StepTimeReward: -0.2
   neutralMaterial: {fileID: 2100000, guid: 4a89cc351e6c628469943e5fc9b302f7, type: 2}
---- !u!114 &1422287545361408604
+  items: []
+--- !u!114 &2358845908333356136
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -139,7 +140,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a5c9d521e5ef4759a8246a07d52221e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DecisionPeriod: 1
+  DecisionPeriod: 5
   DecisionStep: 0
   TakeActionsBetweenDecisions: 1
 --- !u!1 &4629662398183539375

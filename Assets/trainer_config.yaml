@@ -2,8 +2,8 @@ behaviors:
   Dlivery_Bot_2:
     trainer_type: ppo
     hyperparameters:
-      batch_size: 1024
-      buffer_size: 10240
+      batch_size: 512
+      buffer_size: 2560
       learning_rate: 0.0003
       beta: 0.005
       epsilon: 0.2
@@ -23,7 +23,7 @@ behaviors:
     checkpoint_interval: 100000
     max_steps: 4000000
     time_horizon: 1024
-    summary_freq: 40000
+    summary_freq: 10000
     # threaded: False
 
     
