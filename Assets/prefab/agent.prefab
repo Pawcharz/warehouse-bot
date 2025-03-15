@@ -11,8 +11,8 @@ GameObject:
   - component: {fileID: 479029623770934511}
   - component: {fileID: 7857986801689507661}
   - component: {fileID: 477313860672277574}
-  - component: {fileID: 4433824349836300401}
-  - component: {fileID: 2358845908333356136}
+  - component: {fileID: 6954897086683824251}
+  - component: {fileID: 8273998458793728968}
   m_Layer: 0
   m_Name: agent
   m_TagString: Player
@@ -95,7 +95,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &4433824349836300401
+--- !u!114 &6954897086683824251
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -110,7 +110,7 @@ MonoBehaviour:
   agentParameters:
     maxStep: 0
   hasUpgradedFromAgentParameters: 1
-  MaxStep: 500
+  MaxStep: 0
   movementSpeed: 3
   rotationSpeed: 180
   numberOfRays: 24
@@ -120,15 +120,15 @@ MonoBehaviour:
   maxSpawnOffset: 2
   body: {fileID: 2669153520018726259}
   rigidbody: {fileID: 477313860672277574}
-  hitWallPenalty: -100
+  hitWallPenalty: -200
   PickupCorrectReward: 100
-  PickupIncorrectPenalty: -100
+  PickupIncorrectPenalty: 0
   DropCorrectReward: 100
-  DropIncorrectReward: -100
+  DropIncorrectReward: 0
   StepTimeReward: -0.2
   neutralMaterial: {fileID: 2100000, guid: 4a89cc351e6c628469943e5fc9b302f7, type: 2}
   items: []
---- !u!114 &2358845908333356136
+--- !u!114 &8273998458793728968
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

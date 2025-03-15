@@ -165,7 +165,7 @@ public class RobotAgent : Agent
         // Already picked up scenario
 
         // if (random < 0.333)
-        if (random < 1)
+        if (random < 0.4)
         {
             heldResource = demandedResource;
 

@@ -127,9 +127,37 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1016738616051097716, guid: 8db3971268efc23429b219033eafc743, type: 3}
+      propertyPath: m_BehaviorName
+      value: Dlivery_Bot_pos_neg
+      objectReference: {fileID: 0}
     - target: {fileID: 5320183890361133651, guid: 8db3971268efc23429b219033eafc743, type: 3}
       propertyPath: m_Name
       value: Simulation_small
+      objectReference: {fileID: 0}
+    - target: {fileID: 6816506996698941256, guid: 8db3971268efc23429b219033eafc743, type: 3}
+      propertyPath: StepTimeReward
+      value: -0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6816506996698941256, guid: 8db3971268efc23429b219033eafc743, type: 3}
+      propertyPath: hitWallPenalty
+      value: -200
+      objectReference: {fileID: 0}
+    - target: {fileID: 6816506996698941256, guid: 8db3971268efc23429b219033eafc743, type: 3}
+      propertyPath: DropCorrectReward
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 6816506996698941256, guid: 8db3971268efc23429b219033eafc743, type: 3}
+      propertyPath: DropIncorrectReward
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6816506996698941256, guid: 8db3971268efc23429b219033eafc743, type: 3}
+      propertyPath: PickupCorrectReward
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 6816506996698941256, guid: 8db3971268efc23429b219033eafc743, type: 3}
+      propertyPath: PickupIncorrectPenalty
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8321013833124835573, guid: 8db3971268efc23429b219033eafc743, type: 3}
       propertyPath: m_LocalPosition.x

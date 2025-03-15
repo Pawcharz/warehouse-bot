@@ -125,7 +125,6 @@ public class RobotAgentSimple : Agent
         return results;
     }
 
-
     public override void CollectObservations(VectorSensor sensor)
     {
 
@@ -185,7 +184,6 @@ public class RobotAgentSimple : Agent
         {
             Debug.Log("Timeout - reward - " + GetCumulativeReward());
             AddReward(MaxStep * StepTimeReward);
-            // EndEpisode();
         }
 
         AddReward(StepTimeReward);
