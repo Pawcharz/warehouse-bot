@@ -110,7 +110,7 @@ MonoBehaviour:
   agentParameters:
     maxStep: 0
   hasUpgradedFromAgentParameters: 1
-  MaxStep: 0
+  MaxStep: 500
   movementSpeed: 3
   rotationSpeed: 180
   numberOfRays: 24
