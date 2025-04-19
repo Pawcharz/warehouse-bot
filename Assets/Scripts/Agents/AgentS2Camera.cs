@@ -5,7 +5,7 @@ using Unity.MLAgents.Sensors;
 using UnityEngine.AI;
 using System.Collections.Generic;
 
-public class RobotAgent : Agent
+public class AgentS2Camera : Agent
 {
     [SerializeField] private float movementSpeed = 3f;
     [SerializeField] private float rotationSpeed = 180f;
@@ -15,31 +15,17 @@ public class RobotAgent : Agent
 
     [SerializeField] private Transform warehouseTransform;
 
-    [SerializeField] private Transform colorIndicator;
-
-
 
     [SerializeField] private float maxSpawnOffset = 2f;
-
-    [SerializeField] private Renderer body;
-
 
     [SerializeField] private Rigidbody rigidbody;
 
     // Rewards
     [SerializeField] private float hitWallPenalty = -100;
 
-    [SerializeField] private float PickupCorrectReward = 100;
-    [SerializeField] private float PickupIncorrectPenalty = -100;
-
     [SerializeField] private float DropCorrectReward = 100;
-    [SerializeField] private float DropIncorrectReward = -100;
 
     [SerializeField] private float StepTimeReward = -0.4f;
-
-
-    [SerializeField] private Material neutralMaterial;
-    [SerializeField] private List<GameObject> items;
 
 
     private Resource TagToResource(string tag)
@@ -54,136 +40,26 @@ public class RobotAgent : Agent
     {
         if (other.tag == "Warehouse")
         {
-            if (heldResource == demandedResource)
-            {
-                Debug.Log("Dropped Correctly");
-                heldResource = Resource.None;
-                AddReward(DropCorrectReward);
+            Debug.Log("Dropped Correctly");
+            heldResource = Resource.None;
+            AddReward(DropCorrectReward);
 
-                EndEpisode();
-            }
-            else
-            {
-                AddReward(DropIncorrectReward);
-            }
-        }
-        else
-        {
-            foreach (GameObject item in items)
-            {
-                if (other.tag == item.tag)
-                {
-                    // Found item by entering the sphere
-                    if (TagToResource(item.tag) == demandedResource && demandedResource != heldResource)
-                    {
-                        // pick up
-                        Debug.Log("Picked up correctly");
-
-                        heldResource = demandedResource;
-                        AddReward(PickupCorrectReward);
-
-                        // Set body color
-                        Material material = item.gameObject.GetComponent<Renderer>().material;
-                        body.material = material;
-
-                        // SetBodyColor();
-                        item.SetActive(false);
-                    }
-                    else
-                    {
-                        Debug.Log("Picked up incorrectly");
-                        AddReward(PickupIncorrectPenalty);
-                    }
-                }
-            }
+            EndEpisode();
         }
     }
 
     private Resource heldResource = Resource.None;
     private Resource demandedResource;
 
-    private Material GetProperColor()
-    {
-        foreach (GameObject item in items)
-        {
-            if (TagToResource(item.tag) == heldResource)
-            {
-                Material material = item.gameObject.GetComponent<Renderer>().material;
-                return material;
-            }
-        }
-
-        return neutralMaterial;
-    }
-    
-    private void SetBodyColor()
-    {
-        body.material = GetProperColor();
-    }
-
-    private void ChooseDemandedResource()
-    {
-        int id = Random.Range(0, items.Count);
-        demandedResource = TagToResource(items[id].tag);
-    }
 
     private void SetupSimulation()
     {
-        // Activate resources again
-
-        foreach (GameObject item in items)
-        {
-            item.SetActive(true);
-        }
-
         transform.localPosition = Vector3.zero;
         transform.localRotation = Quaternion.AngleAxis(Random.Range(0, 360), transform.up);
 
-        // Randomize strategic points locations
+        // Randomize warehouse locations
         warehouseTransform.localPosition = new Vector3(Random.Range(-maxSpawnOffset, maxSpawnOffset), 0, Random.Range(-maxSpawnOffset, maxSpawnOffset));
 
-        foreach (GameObject item in items)
-        {
-            item.transform.localPosition = new Vector3(Random.Range(-maxSpawnOffset, maxSpawnOffset), 0, Random.Range(-maxSpawnOffset, maxSpawnOffset));
-        }
-
-        // Randomize Initial state
-        float random = Random.Range(0f, 1f);
-        ChooseDemandedResource();
-
-        // Set indicator to demanded resource
-        foreach (GameObject item in items)
-        {
-            if (TagToResource(item.tag) == demandedResource)
-            {
-                Material material = item.gameObject.GetComponent<Renderer>().material;
-
-                colorIndicator.GetComponent<Renderer>().material = material;
-            }
-        }
-
-        // Already picked up scenario
-
-        // if (random < 0.333)
-        if (random < 0.4)
-        {
-            heldResource = demandedResource;
-
-            // Deactivate already picked up resource
-            foreach (GameObject item in items)
-            {
-                if (TagToResource(item.tag) == heldResource)
-                {
-                    item.SetActive(false);
-                }
-            }
-        }
-        else
-        {
-            heldResource = Resource.None;
-        }
-
-        SetBodyColor();
     }
 
     public override void OnEpisodeBegin()
@@ -249,7 +125,6 @@ public class RobotAgent : Agent
         return results;
     }
 
-
     public override void CollectObservations(VectorSensor sensor)
     {
 
@@ -276,8 +151,6 @@ public class RobotAgent : Agent
         {
             sensor.AddObservation(obs.distance);
             sensor.AddObservation(obs.warehousHit);
-            sensor.AddObservation(obs.yellowResourceHit);
-            sensor.AddObservation(obs.blueResourceHit);
         }
     }
 
@@ -311,7 +184,6 @@ public class RobotAgent : Agent
         {
             Debug.Log("Timeout - reward - " + GetCumulativeReward());
             AddReward(MaxStep * StepTimeReward);
-            EndEpisode();
         }
 
         AddReward(StepTimeReward);
@@ -321,7 +193,6 @@ public class RobotAgent : Agent
     {
         if (collision.gameObject.tag == "Wall")
         {
-            //Debug.Log("Hit Wall");
             AddReward(hitWallPenalty);
 
             EndEpisode();

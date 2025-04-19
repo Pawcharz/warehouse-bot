@@ -120,7 +120,7 @@ MonoBehaviour:
   maxSpawnOffset: 2
   body: {fileID: 2669153520018726259}
   rigidbody: {fileID: 477313860672277574}
-  hitWallPenalty: -200
+  hitWallPenalty: -100
   PickupCorrectReward: 100
   PickupIncorrectPenalty: 0
   DropCorrectReward: 100
@@ -128,6 +128,7 @@ MonoBehaviour:
   StepTimeReward: -0.2
   neutralMaterial: {fileID: 2100000, guid: 4a89cc351e6c628469943e5fc9b302f7, type: 2}
   items: []
+  PartiallyCompletedPercentage: 0
 --- !u!114 &8273998458793728968
 MonoBehaviour:
   m_ObjectHideFlags: 0

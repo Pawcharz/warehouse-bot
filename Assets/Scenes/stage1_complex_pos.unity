@@ -131,6 +131,18 @@ PrefabInstance:
       propertyPath: m_BehaviorName
       value: Dlivery_Bot_pos_neg
       objectReference: {fileID: 0}
+    - target: {fileID: 1016738616051097716, guid: 8db3971268efc23429b219033eafc743, type: 3}
+      propertyPath: m_BrainParameters.NumStackedVectorObservations
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1279628109977177329, guid: 8db3971268efc23429b219033eafc743, type: 3}
+      propertyPath: DecisionStep
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1279628109977177329, guid: 8db3971268efc23429b219033eafc743, type: 3}
+      propertyPath: DecisionPeriod
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 5320183890361133651, guid: 8db3971268efc23429b219033eafc743, type: 3}
       propertyPath: m_Name
       value: Simulation_small
