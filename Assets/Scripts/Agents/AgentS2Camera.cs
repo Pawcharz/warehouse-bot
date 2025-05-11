@@ -10,8 +10,9 @@ public class AgentS2Camera : Agent
     [SerializeField] private float movementSpeed = 3f;
     [SerializeField] private float rotationSpeed = 180f;
 
-    [SerializeField] private int numberOfRays = 24; // Number of rays to cast
-    [SerializeField] private float rayDistance = 100f; // Distance of each ray
+    [SerializeField] private int numberOfRays = 8; // Number of rays to cast
+    [SerializeField] private float rayDistance = 2.5f; // Distance of each ray
+    [SerializeField] private float rayMissedValue = 100f; // Value to use if ray doesn't hit anything
 
     [SerializeField] private Transform warehouseTransform;
 
@@ -21,11 +22,11 @@ public class AgentS2Camera : Agent
     [SerializeField] private Rigidbody rigidbody;
 
     // Rewards
-    [SerializeField] private float hitWallPenalty = -100;
+    [SerializeField] private float hitWallPenalty = -50;
 
-    [SerializeField] private float DropCorrectReward = 100;
+    [SerializeField] private float FindWarehouseReward = 50;
 
-    [SerializeField] private float StepTimeReward = -0.4f;
+    [SerializeField] private float StepTimeReward = -0.2f;
 
 
     private Resource TagToResource(string tag)
@@ -42,7 +43,7 @@ public class AgentS2Camera : Agent
         {
             Debug.Log("Dropped Correctly");
             heldResource = Resource.None;
-            AddReward(DropCorrectReward);
+            AddReward(FindWarehouseReward);
 
             EndEpisode();
         }
@@ -68,17 +69,9 @@ public class AgentS2Camera : Agent
         SetupSimulation();
     }
 
-    private struct RaycastObservation
+    private float[] GetRaycastObservations()
     {
-        public float distance;
-        public bool warehousHit;
-        public bool yellowResourceHit;
-        public bool blueResourceHit;
-    };
-
-    private RaycastObservation[] GetRaycastObservations()
-    {
-        RaycastObservation[] results = new RaycastObservation[numberOfRays];
+        float[] results = new float[numberOfRays];
 
         float angleIncrement = 360f / numberOfRays;
 
@@ -97,6 +90,7 @@ public class AgentS2Camera : Agent
             // Debuging Lines
             if (blocked)
             {
+                results[i] = hit.distance;
                 // Log the hit position
                 // Debug.Log($"Ray {i} hit: {hit.point}");
 
@@ -105,21 +99,11 @@ public class AgentS2Camera : Agent
             }
             else
             {
+                results[i] = rayMissedValue;
+
                 // Visualize the ray in the Scene view (no hit)
                 Debug.DrawLine(startPosition, startPosition + direction * rayDistance, Color.red);
             }
-
-            // Adding observations
-
-            RaycastObservation raycastObservation = new RaycastObservation();
-
-            tag = hit.collider.tag;
-            raycastObservation.distance = hit.distance;
-            raycastObservation.warehousHit = tag == "Warehouse";
-            raycastObservation.yellowResourceHit = tag == "Resource_Yellow";
-            raycastObservation.blueResourceHit = tag == "Resource_Blue";
-
-            results[i] = raycastObservation;
         }
 
         return results;
@@ -145,13 +129,8 @@ public class AgentS2Camera : Agent
 
         // Raycasts - Lines of Sight
 
-        RaycastObservation[] raycastsObservations = GetRaycastObservations();
-
-        foreach (RaycastObservation obs in raycastsObservations)
-        {
-            sensor.AddObservation(obs.distance);
-            sensor.AddObservation(obs.warehousHit);
-        }
+        float[] raycastsObservations = GetRaycastObservations();
+        sensor.AddObservation(raycastsObservations);
     }
 
     public override void OnActionReceived(ActionBuffers actions)
