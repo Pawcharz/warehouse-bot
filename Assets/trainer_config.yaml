@@ -1,5 +1,5 @@
 behaviors:
-  Dlivery_Bot_pos_neg:
+  Dlivery_Bot:
     trainer_type: ppo
     hyperparameters:
       batch_size: 512
@@ -11,10 +11,11 @@ behaviors:
       num_epoch: 3
       learning_rate_schedule: linear
     network_settings:
-      normalize: True
+      normalize: false
       hidden_units: 256
       num_layers: 2
       vis_encode_type: simple
+      use_visual_encoder: true
     reward_signals:
       extrinsic:
         gamma: 0.99
@@ -24,6 +25,3 @@ behaviors:
     max_steps: 4000000
     time_horizon: 1024
     summary_freq: 10000
-    # threaded: False
-
-    

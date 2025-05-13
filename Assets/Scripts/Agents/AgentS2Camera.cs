@@ -2,8 +2,6 @@ using UnityEngine;
 using Unity.MLAgents;
 using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Sensors;
-using UnityEngine.AI;
-using System.Collections.Generic;
 
 public class AgentS2Camera : Agent
 {
@@ -28,14 +26,13 @@ public class AgentS2Camera : Agent
 
     [SerializeField] private float StepTimeReward = -0.2f;
 
+    // Potential Based Reward
+    [SerializeField] private float potentialRewardDistanceCoefficient = 0.1f;
 
-    private Resource TagToResource(string tag)
-    {
-        if (tag == "Resource_Blue") return Resource.Blue;
-        if (tag == "Resource_Yellow") return Resource.Yellow;
+    private const float UNDEFINED_POTENTIAL = float.MinValue;
+    private float potentialMeasure = UNDEFINED_POTENTIAL;
 
-        return Resource.None;
-    }
+    private float potentialRewardsCum = 0;
 
     private void EnterTrigger(Collider other)
     {
@@ -55,6 +52,7 @@ public class AgentS2Camera : Agent
 
     private void SetupSimulation()
     {
+        potentialRewardsCum = 0;
         transform.localPosition = Vector3.zero;
         transform.localRotation = Quaternion.AngleAxis(Random.Range(0, 360), transform.up);
 
@@ -133,6 +131,23 @@ public class AgentS2Camera : Agent
         sensor.AddObservation(raycastsObservations);
     }
 
+    /**
+     * Calculates potential measure and adds reward based on previous one
+     * Adds potential based reward/penalty - potential being the negative distance
+     */
+    private void ManageDistanceReward()
+    {
+        float newPotentialMeasure = -(transform.position - warehouseTransform.position).magnitude * potentialRewardDistanceCoefficient;
+        if (potentialMeasure != UNDEFINED_POTENTIAL)
+        {
+            float rew = newPotentialMeasure - potentialMeasure;
+            //Debug.Log("distance reward = " + rew);
+            AddReward(rew);
+            potentialRewardsCum += rew;
+        }
+        potentialMeasure = newPotentialMeasure;
+    }
+
     public override void OnActionReceived(ActionBuffers actions)
     {
         int action = actions.DiscreteActions[0];
@@ -166,6 +181,7 @@ public class AgentS2Camera : Agent
         }
 
         AddReward(StepTimeReward);
+        ManageDistanceReward();
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -174,6 +190,8 @@ public class AgentS2Camera : Agent
         {
             AddReward(hitWallPenalty);
 
+            //Debug.Log("Cumulative potential reward = " + potentialRewardsCum);
+            //Debug.Log("Avg potential reward = " + potentialRewardsCum / StepCount);
             EndEpisode();
         }
     }

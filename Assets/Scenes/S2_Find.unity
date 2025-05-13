@@ -248,9 +248,21 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 29033615200391027, guid: 2a5a951c07ecbd34a8688fd6893ddad2, type: 3}
+      propertyPath: TakeActionsBetweenDecisions
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4878972365849077617, guid: 2a5a951c07ecbd34a8688fd6893ddad2, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -6
+      objectReference: {fileID: 0}
     - target: {fileID: 5320183890361133651, guid: 2a5a951c07ecbd34a8688fd6893ddad2, type: 3}
       propertyPath: m_Name
       value: S2_Camera_FindWarehouse
+      objectReference: {fileID: 0}
+    - target: {fileID: 7434547640038776645, guid: 2a5a951c07ecbd34a8688fd6893ddad2, type: 3}
+      propertyPath: m_Grayscale
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8321013833124835573, guid: 2a5a951c07ecbd34a8688fd6893ddad2, type: 3}
       propertyPath: m_LocalPosition.x
@@ -291,6 +303,10 @@ PrefabInstance:
     - target: {fileID: 8321013833124835573, guid: 2a5a951c07ecbd34a8688fd6893ddad2, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8965786512310698936, guid: 2a5a951c07ecbd34a8688fd6893ddad2, type: 3}
+      propertyPath: m_BehaviorName
+      value: Dlivery_Bot
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

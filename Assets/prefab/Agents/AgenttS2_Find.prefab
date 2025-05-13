@@ -64,7 +64,7 @@ MonoBehaviour:
   m_Model: {fileID: 0}
   m_InferenceDevice: 0
   m_BehaviorType: 0
-  m_BehaviorName: Dlivery_Bot_2
+  m_BehaviorName: Dlivery_Bot
   TeamId: 0
   m_UseChildSensors: 1
   m_UseChildActuators: 1
@@ -122,8 +122,9 @@ MonoBehaviour:
   maxSpawnOffset: 2
   rigidbody: {fileID: 477313860672277574}
   hitWallPenalty: -50
-  DropCorrectReward: 50
+  FindWarehouseReward: 50
   StepTimeReward: -0.2
+  potentialRewardDistanceCoefficient: 10
 --- !u!114 &1226905318642760582
 MonoBehaviour:
   m_ObjectHideFlags: 0
