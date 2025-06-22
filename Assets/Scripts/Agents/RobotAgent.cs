@@ -264,7 +264,7 @@ public class RobotAgent : Agent
         bool isBlueHeld = heldResource == Resource.Blue;
         sensor.AddObservation(isBlueHeld);
 
-        bool isYellowHeld = heldResource == Resource.Blue;
+        bool isYellowHeld = heldResource == Resource.Yellow;
         sensor.AddObservation(isYellowHeld);
 
 

@@ -11,9 +11,12 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/Simulation_raycasts_simplified.unity
     guid: 177f81baa37cb2f43a57a5336441ed03
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/S2_Find.unity
     guid: 19d1c2d58f421dc41af7528f3d6d25c1
+  - enabled: 1
+    path: Assets/Scenes/stage1_complex_pos_neg.unity
+    guid: d3997981d75a23f41be675a4bbd5aced
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0

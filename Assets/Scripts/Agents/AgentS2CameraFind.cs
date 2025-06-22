@@ -3,13 +3,13 @@ using Unity.MLAgents;
 using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Sensors;
 
-public class AgentS2Camera : Agent
+public class AgentS2CameraFind : Agent
 {
-    [SerializeField] private float movementSpeed = 3f;
-    [SerializeField] private float rotationSpeed = 180f;
+    [SerializeField] private float movementSpeed = 10f;
+    [SerializeField] private float rotationSpeed = 360f;
 
-    [SerializeField] private int numberOfRays = 8; // Number of rays to cast
-    [SerializeField] private float rayDistance = 2.5f; // Distance of each ray
+    [SerializeField] private int numberOfRays = 16; // Number of rays to cast
+    [SerializeField] private float rayDistance = 2f; // Distance of each ray
 
     [Tooltip("The value recorded if a raycast does not hit anything. It is a proportion of maximum ray distance as the hit distances are normalized.")]
     [SerializeField] private float rayMissedValue = 1.5f;
@@ -24,12 +24,12 @@ public class AgentS2Camera : Agent
     // Rewards
     [SerializeField] private float hitWallPenalty = -50;
 
-    [SerializeField] private float FindWarehouseReward = 50;
+    [SerializeField] private float FindWarehouseReward = 100;
 
-    [SerializeField] private float StepTimeReward = -0.2f;
+    [SerializeField] private float StepTimeReward = -0.05f;
 
     // Potential Based Reward
-    [SerializeField] private float potentialRewardDistanceCoefficient = 0.1f;
+    [SerializeField] private float potentialRewardDistanceCoefficient = 5f;
 
     private const float UNDEFINED_POTENTIAL = 0;
     private float potentialMeasure = UNDEFINED_POTENTIAL;
@@ -113,23 +113,7 @@ public class AgentS2Camera : Agent
 
     public override void CollectObservations(VectorSensor sensor)
     {
-        // Demanded Resource
-        /*bool isBlueDemanded = demandedResource == Resource.Blue;
-        sensor.AddObservation(isBlueDemanded);
-
-        bool isYellowDemanded = demandedResource == Resource.Yellow;
-        sensor.AddObservation(isYellowDemanded);
-
-        // Held Resource
-        bool isBlueHeld = heldResource == Resource.Blue;
-        sensor.AddObservation(isBlueHeld);
-
-        bool isYellowHeld = heldResource == Resource.Yellow;
-        sensor.AddObservation(isYellowHeld);*/
-
-
         // Raycasts - Lines of Sight
-
         float[] raycastsObservations = GetRaycastObservations();
         sensor.AddObservation(raycastsObservations);
     }

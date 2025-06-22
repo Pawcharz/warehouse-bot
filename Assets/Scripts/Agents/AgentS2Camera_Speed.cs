@@ -3,7 +3,7 @@ using Unity.MLAgents;
 using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Sensors;
 
-public class AgentS2Camera : Agent
+public class AgentS2Camera_Speed : Agent
 {
     [SerializeField] private float movementSpeed = 3f;
     [SerializeField] private float rotationSpeed = 180f;
@@ -97,14 +97,14 @@ public class AgentS2Camera : Agent
                 // Debug.Log($"Ray {i} hit: {hit.point}");
 
                 // Visualize the ray in the Scene view
-                Debug.DrawLine(startPosition, hit.point, Color.green);
+                // Debug.DrawLine(startPosition, hit.point, Color.green);
             }
             else
             {
                 results[i] = rayMissedValue;
 
                 // Visualize the ray in the Scene view (no hit)
-                Debug.DrawLine(startPosition, startPosition + direction * rayDistance, Color.red);
+                // Debug.DrawLine(startPosition, startPosition + direction * rayDistance, Color.red);
             }
         }
 
@@ -113,8 +113,9 @@ public class AgentS2Camera : Agent
 
     public override void CollectObservations(VectorSensor sensor)
     {
+
         // Demanded Resource
-        /*bool isBlueDemanded = demandedResource == Resource.Blue;
+        bool isBlueDemanded = demandedResource == Resource.Blue;
         sensor.AddObservation(isBlueDemanded);
 
         bool isYellowDemanded = demandedResource == Resource.Yellow;
@@ -125,7 +126,7 @@ public class AgentS2Camera : Agent
         sensor.AddObservation(isBlueHeld);
 
         bool isYellowHeld = heldResource == Resource.Yellow;
-        sensor.AddObservation(isYellowHeld);*/
+        sensor.AddObservation(isYellowHeld);
 
 
         // Raycasts - Lines of Sight
@@ -199,7 +200,7 @@ public class AgentS2Camera : Agent
     private void FixedUpdate()
     {
         //RequestDecision();
-        //Debug.Log(StepCount);
+        Debug.Log(StepCount);
 
         // Rotate
         rigidbody.MoveRotation(rigidbody.rotation * Quaternion.Euler(0, turnAmount * rotationSpeed * Time.fixedDeltaTime, 0));
