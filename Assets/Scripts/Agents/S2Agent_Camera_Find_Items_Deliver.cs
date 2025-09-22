@@ -42,8 +42,12 @@ public class S2Agent_Camera_Find_Items_Deliver : Agent
     private Material defaultMaterial;
 
     private GameObject demandedItem;
-
     private GameObject heldItem = null;
+
+    private int baseSeed = 0;
+
+    private float pendingMovement = 0f;
+    private float pendingRotation = 0f;
 
     private void Start()
     {
@@ -54,10 +58,18 @@ public class S2Agent_Camera_Find_Items_Deliver : Agent
     {
         if (items.Contains(other.gameObject))
         {
-            if (other.gameObject == demandedItem)
+            if (heldItem == null)
             {
-                Debug.Log("Picked up Correctly");
-                AddReward(findCorrectItemReward);
+                if (other.gameObject == demandedItem)
+                {
+                    Debug.Log("Picked up Correctly");
+                    AddReward(findCorrectItemReward);
+                }
+                else
+                {
+                    Debug.Log("Picked up Incorrectly");
+                    AddReward(findIncorrectItemReward);
+                }
                 heldItem = other.gameObject;
                 other.gameObject.SetActive(false);
 
@@ -65,14 +77,13 @@ public class S2Agent_Camera_Find_Items_Deliver : Agent
             }
             else
             {
-                Debug.Log("Picked up Incorrectly");
-                AddReward(findIncorrectItemReward);
                 EndEpisode();
             }
+            
         }
         else if (other.gameObject == warehouse)
         {
-            if (heldItem != null)
+            if (heldItem == demandedItem)
             {
                 Debug.Log("Delivered Correctly");
                 AddReward(deliverCorrectlyReward);
@@ -92,7 +103,7 @@ public class S2Agent_Camera_Find_Items_Deliver : Agent
         heldItem = null;
         transform.localPosition = Vector3.zero;
         transform.localRotation = Quaternion.AngleAxis(Random.Range(0, 360), transform.up);
-
+        
         // Randomize items positions and set demanded item
         float randomItemId = Random.Range(0, items.Count);
 
@@ -120,6 +131,10 @@ public class S2Agent_Camera_Find_Items_Deliver : Agent
     public override void OnEpisodeBegin()
     {
         base.OnEpisodeBegin();
+
+        int seed = baseSeed + CompletedEpisodes;
+        Random.InitState(seed);
+
         SetupSimulation();
     }
 
@@ -131,13 +146,15 @@ public class S2Agent_Camera_Find_Items_Deliver : Agent
 
     public override void CollectObservations(VectorSensor sensor)
     {
-        // Adds oneHotEncoded demanded items
+        // possible item states: [None, item1, item2, ...]
+
         // It's important that the items are always passed in the same order to the network
         int demandedItemIndex = items.FindIndex(el => el == demandedItem);
-        for (int i = 0; i < items.Count; i++)
-        {
-            sensor.AddObservation(i == demandedItemIndex);
-        }
+        int heldItemIndex = items.FindIndex(el => el == heldItem);
+
+        // Item indices
+        sensor.AddObservation(demandedItemIndex + 1);
+        sensor.AddObservation(heldItemIndex + 1);
     }
 
     public override void OnActionReceived(ActionBuffers actions)
@@ -160,11 +177,14 @@ public class S2Agent_Camera_Find_Items_Deliver : Agent
             rotation = 1;
         }
 
-        movement = movement * Time.fixedDeltaTime * this.movementSpeed;
+        /*movement = movement * Time.fixedDeltaTime * this.movementSpeed;
         rotation = rotation * Time.fixedDeltaTime * this.rotationSpeed;
 
         transform.localPosition += transform.forward * movement;
-        transform.Rotate(new Vector3(0, rotation, 0));
+        transform.Rotate(new Vector3(0, rotation, 0));*/
+
+        pendingMovement = movement * Time.fixedDeltaTime * this.movementSpeed;
+        pendingRotation = rotation * Time.fixedDeltaTime * this.rotationSpeed;
 
         if (StepCount >= MaxStep)
         {
@@ -193,5 +213,17 @@ public class S2Agent_Camera_Find_Items_Deliver : Agent
     private void FixedUpdate()
     {
         rigidbody.rotation = Quaternion.Euler(0, rigidbody.rotation.eulerAngles.y, 0);
+
+        if (pendingMovement != 0f)
+        {
+            rigidbody.MovePosition(rigidbody.position + transform.forward * pendingMovement);
+            pendingMovement = 0f;
+        }
+
+        if (pendingRotation != 0f)
+        {
+            rigidbody.MoveRotation(rigidbody.rotation * Quaternion.Euler(0, pendingRotation, 0));
+            pendingRotation = 0f;
+        }
     }
 }

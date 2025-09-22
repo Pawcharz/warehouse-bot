@@ -26,15 +26,18 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/S1_Find_Deliver.unity
     guid: 4c7aecd97dfd88d49a7409ceeeb0ec97
-  - enabled: 0
-    path: Assets/Scenes/S2_Find_Items_Camera.unity
+  - enabled: 1
+    path: Assets/Scenes/S2_Find_Items_Camera_64x36.unity
     guid: 35bbea4000e56f044a5e78ae122d96e5
   - enabled: 0
-    path: Assets/Scenes/S2_Find_1Item_Camera.unity
+    path: Assets/Scenes/S2_Find_1Item_Camera_64x36.unity
     guid: 63db6295dd9c6f54d868f9032be2c9b8
-  - enabled: 1
-    path: Assets/Scenes/S2_Find_Items_Deliver_Camera.unity
+  - enabled: 0
+    path: Assets/Scenes/S2_Find_Items_Deliver_Camera_64x36.unity
     guid: 9c883bdad22ccab4cb934c578fea7408
+  - enabled: 0
+    path: Assets/Scenes/S3_Find_Items_Deliver_Complex.unity
+    guid: df2e969eb8f3efb44828bf559fff7b79
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0

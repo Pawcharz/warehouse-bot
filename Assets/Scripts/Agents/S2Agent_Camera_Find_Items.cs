@@ -28,6 +28,11 @@ public class S2Agent_Camera_Find_Items : Agent
 
     private GameObject demandedItem;
 
+    private int baseSeed = 0;
+
+    private float pendingMovement = 0f;
+    private float pendingRotation = 0f;
+
     private void EnterTrigger(Collider other)
     {
         if (items.Contains(other.gameObject))
@@ -42,7 +47,6 @@ public class S2Agent_Camera_Find_Items : Agent
                 Debug.Log("Picked up Incorrectly");
                 AddReward(findIncorrectItemReward);
             }
-
 
             EndEpisode();
         }
@@ -75,6 +79,10 @@ public class S2Agent_Camera_Find_Items : Agent
     public override void OnEpisodeBegin()
     {
         base.OnEpisodeBegin();
+
+        int seed = baseSeed + CompletedEpisodes;
+        Random.InitState(seed);
+
         SetupSimulation();
     }
 
@@ -86,12 +94,13 @@ public class S2Agent_Camera_Find_Items : Agent
 
     public override void CollectObservations(VectorSensor sensor)
     {
-        // Adds oneHotEncoded demanded items
+        // possible item states: [None, item1, item2, ...]
         int demandedItemIndex = items.FindIndex(el => el == demandedItem);
-        for (int i = 0; i < items.Count; i++)
-        {
-            sensor.AddObservation(i == demandedItemIndex);
-        }
+        // Item indices
+
+        // Index 0 reserved for None
+        sensor.AddObservation(demandedItemIndex+1);
+        sensor.AddObservation(0);
     }
 
     public override void OnActionReceived(ActionBuffers actions)
@@ -114,11 +123,14 @@ public class S2Agent_Camera_Find_Items : Agent
             rotation = 1;
         }
 
-        movement = movement * Time.fixedDeltaTime * this.movementSpeed;
+        /*movement = movement * Time.fixedDeltaTime * this.movementSpeed;
         rotation = rotation * Time.fixedDeltaTime * this.rotationSpeed;
 
         transform.localPosition += transform.forward * movement;
-        transform.Rotate(new Vector3(0, rotation, 0));
+        transform.Rotate(new Vector3(0, rotation, 0));*/
+
+        pendingMovement = movement * Time.fixedDeltaTime * this.movementSpeed;
+        pendingRotation = rotation * Time.fixedDeltaTime * this.rotationSpeed;
 
         if (StepCount >= MaxStep)
         {
@@ -147,5 +159,17 @@ public class S2Agent_Camera_Find_Items : Agent
     private void FixedUpdate()
     {
         rigidbody.rotation = Quaternion.Euler(0, rigidbody.rotation.eulerAngles.y, 0);
+
+        if (pendingMovement != 0f)
+        {
+            rigidbody.MovePosition(rigidbody.position + transform.forward * pendingMovement);
+            pendingMovement = 0f;
+        }
+
+        if (pendingRotation != 0f)
+        {
+            rigidbody.MoveRotation(rigidbody.rotation * Quaternion.Euler(0, pendingRotation, 0));
+            pendingRotation = 0f;
+        }
     }
 }

@@ -148,7 +148,7 @@ MonoBehaviour:
   agentParameters:
     maxStep: 0
   hasUpgradedFromAgentParameters: 1
-  MaxStep: 200
+  MaxStep: 300
   movementSpeed: 10
   rotationSpeed: 360
   maxItemSpawnOffset: 1.5
