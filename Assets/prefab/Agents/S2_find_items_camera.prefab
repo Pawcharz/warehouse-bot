@@ -116,7 +116,7 @@ MonoBehaviour:
   m_Grayscale: 0
   m_ObservationType: 0
   m_RuntimeCameraEnable: 1
-  m_ObservationStacks: 1
+  m_ObservationStacks: 5
   m_Compression: 0
 --- !u!114 &4678092354407334227
 MonoBehaviour:
@@ -155,7 +155,8 @@ MonoBehaviour:
   rigidbody: {fileID: 477313860672277574}
   colorIndicator: {fileID: 0}
   hitWallPenalty: 0
-  findItemReward: 100
+  findIncorrectItemReward: 20
+  findCorrectItemReward: 100
   StepTimeReward: 0
   items: []
 --- !u!1 &4629662398183539375

@@ -258,7 +258,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8321013833124835573}
   m_Layer: 0
-  m_Name: S3_find_items_deliver_complex_2
+  m_Name: S3_find_items_deliver_complex_2_obstacles
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
