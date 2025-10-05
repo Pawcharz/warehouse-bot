@@ -1,3 +1,4 @@
+// S2Agent_Camera_Find_Items.cs
 using UnityEngine;
 using Unity.MLAgents;
 using Unity.MLAgents.Actuators;
@@ -8,30 +9,29 @@ public class S2Agent_Camera_Find_Items : Agent
 {
     [SerializeField] private float movementSpeed = 10f;
     [SerializeField] private float rotationSpeed = 360f;
-
     [SerializeField] private float maxSpawnOffset = 1.5f;
-
     [SerializeField] private Rigidbody rigidbody;
-
     [SerializeField] private Transform colorIndicator;
 
-    // Rewards
     [SerializeField] private float hitWallPenalty = 0;
-
     [SerializeField] private float findIncorrectItemReward = 20;
-
     [SerializeField] private float findCorrectItemReward = 100;
-
     [SerializeField] private float StepTimeReward = 0f;
 
     [SerializeField] private List<GameObject> items;
 
     private GameObject demandedItem;
-
-    private int baseSeed = 0;
-
     private float pendingMovement = 0f;
     private float pendingRotation = 0f;
+
+    void Awake()
+    {
+        // Lock physics to fixed step
+        Time.fixedDeltaTime = 1f / 60f;
+        Time.maximumDeltaTime = Time.fixedDeltaTime;
+        Physics.simulationMode = SimulationMode.Script;
+        Physics.autoSyncTransforms = true;
+    }
 
     private void EnterTrigger(Collider other)
     {
@@ -47,7 +47,6 @@ public class S2Agent_Camera_Find_Items : Agent
                 Debug.Log("Picked up Incorrectly");
                 AddReward(findIncorrectItemReward);
             }
-
             EndEpisode();
         }
     }
@@ -57,7 +56,7 @@ public class S2Agent_Camera_Find_Items : Agent
         transform.localPosition = Vector3.zero;
         transform.localRotation = Quaternion.AngleAxis(Random.Range(0, 360), transform.up);
 
-        float randomItemId = Random.Range(0, items.Count);
+        int randomItemId = Random.Range(0, items.Count);
 
         // Randomize strategic points locations and set demanded item
         int i = 0;
@@ -68,7 +67,6 @@ public class S2Agent_Camera_Find_Items : Agent
             {
                 demandedItem = item;
             }
-
             i++;
         }
 
@@ -80,26 +78,20 @@ public class S2Agent_Camera_Find_Items : Agent
     {
         base.OnEpisodeBegin();
 
-        int seed = baseSeed + CompletedEpisodes;
-        Random.InitState(seed);
+        // Read base seed from EnvironmentParameters (set in Python via EnvironmentParametersChannel)
+        float baseSeedParam = Academy.Instance.EnvironmentParameters.GetWithDefault("seed", 0f);
+        int seed = Mathf.FloorToInt(baseSeedParam) + CompletedEpisodes;
+
+        Random.InitState(seed); // Not the same as System.Random
 
         SetupSimulation();
     }
-
-    private struct RaycastObservation
-    {
-        public float distance;
-        public bool[] items;
-    };
 
     public override void CollectObservations(VectorSensor sensor)
     {
         // possible item states: [None, item1, item2, ...]
         int demandedItemIndex = items.FindIndex(el => el == demandedItem);
-        // Item indices
-
-        // Index 0 reserved for None
-        sensor.AddObservation(demandedItemIndex+1);
+        sensor.AddObservation(demandedItemIndex + 1); // index 0 reserved for None
         sensor.AddObservation(0);
     }
 
@@ -123,12 +115,6 @@ public class S2Agent_Camera_Find_Items : Agent
             rotation = 1;
         }
 
-        /*movement = movement * Time.fixedDeltaTime * this.movementSpeed;
-        rotation = rotation * Time.fixedDeltaTime * this.rotationSpeed;
-
-        transform.localPosition += transform.forward * movement;
-        transform.Rotate(new Vector3(0, rotation, 0));*/
-
         pendingMovement = movement * Time.fixedDeltaTime * this.movementSpeed;
         pendingRotation = rotation * Time.fixedDeltaTime * this.rotationSpeed;
 
@@ -139,6 +125,8 @@ public class S2Agent_Camera_Find_Items : Agent
         }
 
         AddReward(StepTimeReward);
+
+        Physics.Simulate(Time.fixedDeltaTime);
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -146,7 +134,6 @@ public class S2Agent_Camera_Find_Items : Agent
         if (collision.gameObject.tag == "Wall")
         {
             AddReward(hitWallPenalty);
-
             EndEpisode();
         }
     }
