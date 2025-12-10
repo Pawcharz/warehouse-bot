@@ -385,6 +385,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1925984536560603439, guid: c5a632833bae0334896ece5ee5a484bb, type: 3}
+      propertyPath: m_BrainParameters.VectorObservationSize
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 5320183890361133651, guid: c5a632833bae0334896ece5ee5a484bb, type: 3}
       propertyPath: m_Name
       value: S2_find_item_camera

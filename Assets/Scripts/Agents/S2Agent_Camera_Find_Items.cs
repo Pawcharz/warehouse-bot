@@ -93,6 +93,20 @@ public class S2Agent_Camera_Find_Items : Agent
         int demandedItemIndex = items.FindIndex(el => el == demandedItem);
         sensor.AddObservation(demandedItemIndex + 1); // index 0 reserved for None
         sensor.AddObservation(0);
+
+        // Remember to handle position on the map separately - in gymnasium wrapper
+        float posX = transform.position.x;
+        float posZ = transform.position.z;
+
+        sensor.AddObservation(posX);
+        sensor.AddObservation(posZ);
+
+        // Rotation described as forward - can be displayed as a heatmap of directions
+        float forwardX = transform.forward.x;
+        float forwardZ = transform.forward.z;
+
+        sensor.AddObservation(forwardX);
+        sensor.AddObservation(forwardZ);
     }
 
     public override void OnActionReceived(ActionBuffers actions)

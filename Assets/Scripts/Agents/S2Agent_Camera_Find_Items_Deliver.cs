@@ -44,10 +44,18 @@ public class S2Agent_Camera_Find_Items_Deliver : Agent
     private GameObject demandedItem;
     private GameObject heldItem = null;
 
-    private int baseSeed = 0;
 
     private float pendingMovement = 0f;
     private float pendingRotation = 0f;
+
+    void Awake()
+    {
+        // Lock physics to fixed step
+        Time.fixedDeltaTime = 1f / 60f;
+        Time.maximumDeltaTime = Time.fixedDeltaTime;
+        Physics.simulationMode = SimulationMode.Script;
+        Physics.autoSyncTransforms = true;
+    }
 
     private void Start()
     {
@@ -132,8 +140,11 @@ public class S2Agent_Camera_Find_Items_Deliver : Agent
     {
         base.OnEpisodeBegin();
 
-        int seed = baseSeed + CompletedEpisodes;
-        Random.InitState(seed);
+        // Read base seed from EnvironmentParameters (set in Python via EnvironmentParametersChannel)
+        float baseSeedParam = Academy.Instance.EnvironmentParameters.GetWithDefault("seed", 0f);
+        int seed = Mathf.FloorToInt(baseSeedParam) + CompletedEpisodes;
+
+        Random.InitState(seed); // Not the same as System.Random
 
         SetupSimulation();
     }
@@ -155,6 +166,20 @@ public class S2Agent_Camera_Find_Items_Deliver : Agent
         // Item indices
         sensor.AddObservation(demandedItemIndex + 1);
         sensor.AddObservation(heldItemIndex + 1);
+
+        // Remember to handle position on the map separately - in gymnasium wrapper
+        float posX = transform.position.x;
+        float posZ = transform.position.z;
+
+        sensor.AddObservation(posX);
+        sensor.AddObservation(posZ);
+
+        // Rotation described as forward - can be displayed as a heatmap of directions
+        float forwardX = transform.forward.x;
+        float forwardZ = transform.forward.z;
+
+        sensor.AddObservation(forwardX);
+        sensor.AddObservation(forwardZ);
     }
 
     public override void OnActionReceived(ActionBuffers actions)
@@ -177,12 +202,6 @@ public class S2Agent_Camera_Find_Items_Deliver : Agent
             rotation = 1;
         }
 
-        /*movement = movement * Time.fixedDeltaTime * this.movementSpeed;
-        rotation = rotation * Time.fixedDeltaTime * this.rotationSpeed;
-
-        transform.localPosition += transform.forward * movement;
-        transform.Rotate(new Vector3(0, rotation, 0));*/
-
         pendingMovement = movement * Time.fixedDeltaTime * this.movementSpeed;
         pendingRotation = rotation * Time.fixedDeltaTime * this.rotationSpeed;
 
@@ -193,6 +212,8 @@ public class S2Agent_Camera_Find_Items_Deliver : Agent
         }
 
         AddReward(StepTimeReward);
+
+        Physics.Simulate(Time.fixedDeltaTime);
     }
 
     private void OnCollisionEnter(Collision collision)
